@@ -41,6 +41,11 @@ final class AssetLoader
             ASP_VERSION
         );
 
+        $accent = (string) get_option('asp_accent_color', '#185fa5');
+        if (preg_match('/^#[0-9a-fA-F]{6}$/', $accent)) {
+            wp_add_inline_style(self::HANDLE_STYLE, ':root{--asp-accent:' . $accent . ';}');
+        }
+
         wp_enqueue_script(
             self::HANDLE_SCRIPT,
             $jsUrl,
