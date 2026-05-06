@@ -200,21 +200,26 @@
 	justify-content: space-between;
 	gap: 12px;
 	margin: -1em 0 1.5em;
-	padding: 6px 4px 0;
-	font-size: 13px;
-	color: var(--asp-text-secondary);
+	padding: 8px 4px 0;
+	font-size: 14px;
+	color: var(--asp-text);
 }
 
 .asp-meta__plays {
 	display: inline-flex;
 	align-items: baseline;
-	gap: 4px;
+	gap: 5px;
 	font-variant-numeric: tabular-nums;
 }
 
 .asp-meta__plays-value {
-	font-weight: 600;
+	font-weight: 700;
 	color: var(--asp-text);
+	font-size: 15px;
+}
+
+.asp-meta__plays-label {
+	color: var(--asp-text-secondary);
 }
 
 .asp-meta__reactions {
@@ -225,14 +230,14 @@
 .asp-meta__reaction {
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
-	padding: 4px 8px;
+	gap: 6px;
+	padding: 5px 10px;
 	font-size: 13px;
 	line-height: 1;
 	background: transparent;
-	border: 0.5px solid var(--asp-border);
+	border: 1px solid var(--asp-border);
 	border-radius: 999px;
-	color: var(--asp-text-secondary);
+	color: var(--asp-text);
 	cursor: pointer;
 	transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
 }
@@ -240,6 +245,7 @@
 .asp-meta__reaction:hover {
 	color: var(--asp-text);
 	border-color: var(--asp-text-secondary);
+	background: var(--asp-bg-secondary);
 }
 
 .asp-meta__reaction:focus-visible {
@@ -258,8 +264,14 @@
 	cursor: default;
 }
 
+.asp-meta__reaction-icon {
+	display: block;
+	flex: 0 0 auto;
+}
+
 .asp-meta__reaction-count {
 	font-variant-numeric: tabular-nums;
+	font-weight: 600;
 }
 
 /* ----- Mini-bar ----- */
