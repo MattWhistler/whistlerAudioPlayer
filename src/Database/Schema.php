@@ -12,14 +12,21 @@ namespace AudioSummaryPlayer\Database;
  */
 final class Schema
 {
-    public const SCHEMA_VERSION = '1.0.0';
+    public const SCHEMA_VERSION = '1.1.0';
     public const TABLE          = 'asp_events';
+    public const REACTIONS_TABLE = 'asp_reactions';
     private const OPTION_VERSION = 'asp_db_version';
 
     public static function tableName(): string
     {
         global $wpdb;
         return $wpdb->prefix . self::TABLE;
+    }
+
+    public static function reactionsTableName(): string
+    {
+        global $wpdb;
+        return $wpdb->prefix . self::REACTIONS_TABLE;
     }
 
     /**
@@ -49,8 +56,20 @@ final class Schema
             KEY idx_created (created_at)
         ) {$charset};";
 
+        $reactionsTable = self::reactionsTableName();
+        $reactionsSql = "CREATE TABLE {$reactionsTable} (
+            post_id BIGINT UNSIGNED NOT NULL,
+            session_id CHAR(36) NOT NULL,
+            reaction TINYINT NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY  (post_id, session_id),
+            KEY idx_post_reaction (post_id, reaction)
+        ) {$charset};";
+
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
+        dbDelta($reactionsSql);
 
         update_option(self::OPTION_VERSION, self::SCHEMA_VERSION, false);
     }
@@ -73,6 +92,14 @@ final class Schema
     {
         global $wpdb;
         $table = self::tableName();
+        $found = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table));
+        return $found === $table;
+    }
+
+    public static function reactionsTableExists(): bool
+    {
+        global $wpdb;
+        $table = self::reactionsTableName();
         $found = $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table));
         return $found === $table;
     }

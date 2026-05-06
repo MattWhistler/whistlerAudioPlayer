@@ -23,7 +23,7 @@ use WP_REST_Server;
  */
 final class StatsPage
 {
-    public const PAGE_SLUG = 'audio-summary-player-stats';
+    public const PAGE_SLUG = 'audio-summary-player';
 
     private const PER_PAGE = 20;
     private const SPEED_COLORS = [
@@ -104,9 +104,10 @@ final class StatsPage
     public function addMenu(): void
     {
         $cap = (string) get_option('asp_stats_capability', 'manage_options');
-        add_management_page(
-            __('Statystyki Audio Player', 'audio-summary-player'),
-            __('Statystyki Audio Player', 'audio-summary-player'),
+        add_submenu_page(
+            AdminMenu::PARENT_SLUG,
+            __('Statystyki', 'audio-summary-player'),
+            __('Statystyki', 'audio-summary-player'),
             $cap,
             self::PAGE_SLUG,
             [$this, 'renderPage']
@@ -415,7 +416,7 @@ final class StatsPage
         if ($postFilter > 0) {
             $args['post_id'] = $postFilter;
         }
-        $base = add_query_arg($args, admin_url('tools.php')) . '%_%';
+        $base = add_query_arg($args, admin_url('admin.php')) . '%_%';
 
         $links = paginate_links([
             'base'      => $base,

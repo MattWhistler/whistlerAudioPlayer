@@ -21,7 +21,7 @@
 	const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; /* 30 days */
 
 	const reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
-	const cfg = window.aspConfig || { i18n: {}, debug: false, restUrl: '', nonce: '' };
+	const cfg = window.aspConfig || { i18n: {}, debug: false, restUrl: '', nonce: '', reactionUrl: '', statsUrl: '' };
 
 	function debug( ...args ) {
 		if ( cfg.debug && typeof console !== 'undefined' ) {
@@ -628,6 +628,129 @@
 		}
 	}
 
+	/**
+	 * MetaBar — public play counter and like/dislike reactions rendered
+	 * under the player block. Counts are fetched once per pageload and
+	 * patched optimistically when the user clicks a reaction.
+	 */
+	class MetaBar {
+		constructor( root ) {
+			this.root = root;
+			this.postId = parseInt( root.dataset.postId || '0', 10 );
+			this.playsValueEl = root.querySelector( '[data-asp-plays-value]' );
+			this.likeBtn = root.querySelector( '[data-asp-reaction="like"]' );
+			this.dislikeBtn = root.querySelector( '[data-asp-reaction="dislike"]' );
+			this.likeCountEl = root.querySelector( '[data-asp-likes]' );
+			this.dislikeCountEl = root.querySelector( '[data-asp-dislikes]' );
+			this.current = 'none';
+			this.busy = false;
+
+			if ( this.likeBtn ) {
+				this.likeBtn.addEventListener( 'click', () => this.toggle( 'like' ) );
+			}
+			if ( this.dislikeBtn ) {
+				this.dislikeBtn.addEventListener( 'click', () => this.toggle( 'dislike' ) );
+			}
+		}
+
+		load() {
+			if ( ! cfg.statsUrl || ! this.postId ) return;
+			const url = cfg.statsUrl + ( cfg.statsUrl.indexOf( '?' ) === -1 ? '?' : '&' ) +
+				'post_id=' + encodeURIComponent( this.postId ) +
+				'&session_id=' + encodeURIComponent( Session.get() );
+			fetch( url, { credentials: 'same-origin' } )
+				.then( ( res ) => res.ok ? res.json() : null )
+				.then( ( data ) => {
+					if ( ! data ) return;
+					this.applyCounts( data );
+				} )
+				.catch( ( err ) => debug( 'stats fetch failed', err ) );
+		}
+
+		applyCounts( data ) {
+			if ( this.playsValueEl ) {
+				this.playsValueEl.textContent = String( data.plays || 0 );
+			}
+			if ( this.likeCountEl ) {
+				this.likeCountEl.textContent = String( data.likes || 0 );
+			}
+			if ( this.dislikeCountEl ) {
+				this.dislikeCountEl.textContent = String( data.dislikes || 0 );
+			}
+			this.setActive( data.user_reaction || 'none' );
+		}
+
+		setActive( reaction ) {
+			this.current = reaction;
+			if ( this.likeBtn ) {
+				this.likeBtn.setAttribute( 'aria-pressed', reaction === 'like' ? 'true' : 'false' );
+			}
+			if ( this.dislikeBtn ) {
+				this.dislikeBtn.setAttribute( 'aria-pressed', reaction === 'dislike' ? 'true' : 'false' );
+			}
+		}
+
+		toggle( target ) {
+			if ( this.busy || ! cfg.reactionUrl || ! this.postId ) return;
+			const desired = this.current === target ? 'none' : target;
+			this.busy = true;
+			this.setBusy( true );
+			fetch( cfg.reactionUrl, {
+				method: 'POST',
+				credentials: 'same-origin',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': cfg.nonce || '',
+				},
+				body: JSON.stringify( {
+					post_id: this.postId,
+					session_id: Session.get(),
+					reaction: desired,
+				} ),
+			} )
+				.then( ( res ) => res.ok ? res.json() : Promise.reject( res.status ) )
+				.then( ( data ) => {
+					if ( this.likeCountEl ) {
+						this.likeCountEl.textContent = String( data.likes || 0 );
+					}
+					if ( this.dislikeCountEl ) {
+						this.dislikeCountEl.textContent = String( data.dislikes || 0 );
+					}
+					this.setActive( data.reaction || 'none' );
+				} )
+				.catch( ( err ) => debug( 'reaction failed', err ) )
+				.then( () => {
+					this.busy = false;
+					this.setBusy( false );
+				} );
+		}
+
+		setBusy( busy ) {
+			[ this.likeBtn, this.dislikeBtn ].forEach( ( btn ) => {
+				if ( ! btn ) return;
+				if ( busy ) {
+					btn.setAttribute( 'disabled', 'disabled' );
+				} else {
+					btn.removeAttribute( 'disabled' );
+				}
+			} );
+		}
+	}
+
+	function initMetaBars() {
+		const bars = document.querySelectorAll( '[data-asp-meta]' );
+		bars.forEach( ( root ) => {
+			if ( root._aspMetaInitialized ) return;
+			root._aspMetaInitialized = true;
+			try {
+				const bar = new MetaBar( root );
+				bar.load();
+			} catch ( err ) {
+				debug( 'meta init failure', err );
+			}
+		} );
+	}
+
 	function init() {
 		const roots = document.querySelectorAll( '[data-asp-player]' );
 		roots.forEach( ( root ) => {
@@ -639,6 +762,7 @@
 				debug( 'init failure', err );
 			}
 		} );
+		initMetaBars();
 	}
 
 	if ( document.readyState === 'loading' ) {
