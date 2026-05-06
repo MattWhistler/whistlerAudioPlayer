@@ -61,6 +61,26 @@ final class StatsRepository
     }
 
     /**
+     * All-time non-distinct count of `play_intent` events for a post — used
+     * for the public "plays counter" displayed under the player block.
+     * Bots are always excluded here so the public number stays trustworthy.
+     */
+    public function totalPlaysForPost(int $postId): int
+    {
+        global $wpdb;
+        $table = $this->tableName();
+
+        $sql = "SELECT COUNT(*) FROM {$table}
+                WHERE post_id = %d
+                  AND event_type = 'play_intent'
+                  AND is_bot = 0";
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $table is static.
+        $value = $wpdb->get_var($wpdb->prepare($sql, $postId));
+        return $value === null ? 0 : (int) $value;
+    }
+
+    /**
      * Average `total_listened_seconds` from `complete` and `abandon` events.
      */
     public function avgListenSecondsForPost(int $postId, string $sinceUtc, bool $includeBots = false): float

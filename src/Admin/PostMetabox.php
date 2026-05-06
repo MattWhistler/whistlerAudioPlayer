@@ -63,7 +63,7 @@ final class PostMetabox
         }
         $statsUrl = add_query_arg(
             ['page' => StatsPage::PAGE_SLUG, 'post_id' => $post->ID],
-            admin_url('tools.php')
+            admin_url('admin.php')
         );
         ?>
         <div class="asp-metabox" data-post-id="<?php echo esc_attr((string) $post->ID); ?>">

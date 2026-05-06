@@ -28,9 +28,12 @@ if ($timestamp) {
 wp_clear_scheduled_hook('asp_cleanup_old_events');
 
 if (!$keep_data) {
-    $table = $wpdb->prefix . 'asp_events';
-    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name controlled.
-    $wpdb->query("DROP TABLE IF EXISTS {$table}");
+    $eventsTable = $wpdb->prefix . 'asp_events';
+    $reactionsTable = $wpdb->prefix . 'asp_reactions';
+    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names controlled.
+    $wpdb->query("DROP TABLE IF EXISTS {$eventsTable}");
+    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names controlled.
+    $wpdb->query("DROP TABLE IF EXISTS {$reactionsTable}");
 }
 
 $asp_options = [

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AudioSummaryPlayer;
 
+use AudioSummaryPlayer\Admin\AdminMenu;
 use AudioSummaryPlayer\Admin\CsvExporter;
 use AudioSummaryPlayer\Admin\PostMetabox;
 use AudioSummaryPlayer\Admin\SettingsPage;
@@ -13,6 +14,8 @@ use AudioSummaryPlayer\Database\Schema;
 use AudioSummaryPlayer\Frontend\AssetLoader;
 use AudioSummaryPlayer\Frontend\Shortcode;
 use AudioSummaryPlayer\REST\EventController;
+use AudioSummaryPlayer\REST\PostStatsController;
+use AudioSummaryPlayer\REST\ReactionController;
 use AudioSummaryPlayer\Support\CronCleanup;
 
 /**
@@ -68,9 +71,12 @@ final class Plugin
         (new AssetLoader())->register();
         (new Shortcode())->register();
         (new EventController())->register();
+        (new ReactionController())->register();
+        (new PostStatsController())->register();
         (new CronCleanup())->register();
 
         if (is_admin()) {
+            (new AdminMenu())->register();
             (new SettingsPage())->register();
             (new StatsPage())->register();
             (new PostMetabox())->register();

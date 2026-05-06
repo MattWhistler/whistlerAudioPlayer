@@ -114,6 +114,37 @@ final class PlayerMarkup
             ></audio>
         </div>
 
+        <?php if ($postId > 0) : ?>
+        <div class="asp-meta" data-asp-meta data-post-id="<?php echo esc_attr((string) $postId); ?>">
+            <span class="asp-meta__plays" data-asp-plays>
+                <span class="asp-meta__plays-value" data-asp-plays-value>—</span>
+                <span class="asp-meta__plays-label"><?php esc_html_e('odtworzeń', 'audio-summary-player'); ?></span>
+            </span>
+            <span class="asp-meta__reactions" data-asp-reactions>
+                <button
+                    type="button"
+                    class="asp-meta__reaction"
+                    data-asp-reaction="like"
+                    aria-pressed="false"
+                    aria-label="<?php echo esc_attr__('Lubię to streszczenie', 'audio-summary-player'); ?>"
+                >
+                    <span aria-hidden="true">👍</span>
+                    <span class="asp-meta__reaction-count" data-asp-likes>0</span>
+                </button>
+                <button
+                    type="button"
+                    class="asp-meta__reaction"
+                    data-asp-reaction="dislike"
+                    aria-pressed="false"
+                    aria-label="<?php echo esc_attr__('Nie lubię tego streszczenia', 'audio-summary-player'); ?>"
+                >
+                    <span aria-hidden="true">👎</span>
+                    <span class="asp-meta__reaction-count" data-asp-dislikes>0</span>
+                </button>
+            </span>
+        </div>
+        <?php endif; ?>
+
         <?php if ($miniEnabled) : ?>
         <aside
             class="asp-minibar"

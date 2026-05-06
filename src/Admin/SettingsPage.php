@@ -14,7 +14,7 @@ namespace AudioSummaryPlayer\Admin;
 final class SettingsPage
 {
     private const OPTION_GROUP = 'asp_settings';
-    private const PAGE_SLUG    = 'audio-summary-player';
+    public const PAGE_SLUG    = 'audio-summary-player-settings';
 
     private const RETENTION_CHOICES = [30, 90, 180, 365, 0];
     private const CAP_CHOICES = ['manage_options', 'edit_others_posts', 'edit_posts'];
@@ -28,9 +28,10 @@ final class SettingsPage
 
     public function addMenu(): void
     {
-        add_options_page(
-            __('Audio Summary Player', 'audio-summary-player'),
-            __('Audio Summary Player', 'audio-summary-player'),
+        add_submenu_page(
+            AdminMenu::PARENT_SLUG,
+            __('Ustawienia', 'audio-summary-player'),
+            __('Ustawienia', 'audio-summary-player'),
             'manage_options',
             self::PAGE_SLUG,
             [$this, 'renderPage']
@@ -39,7 +40,7 @@ final class SettingsPage
 
     public function enqueueAssets(string $hook): void
     {
-        if ($hook !== 'settings_page_' . self::PAGE_SLUG) {
+        if (strpos($hook, self::PAGE_SLUG) === false) {
             return;
         }
         wp_enqueue_style('wp-color-picker');

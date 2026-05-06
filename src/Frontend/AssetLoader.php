@@ -57,10 +57,12 @@ final class AssetLoader
         wp_set_script_translations(self::HANDLE_SCRIPT, 'audio-summary-player');
 
         wp_localize_script(self::HANDLE_SCRIPT, 'aspConfig', [
-            'restUrl'   => esc_url_raw(rest_url('asp/v1/event')),
-            'nonce'     => wp_create_nonce('wp_rest'),
-            'debug'     => defined('WP_DEBUG') && WP_DEBUG,
-            'i18n'      => [
+            'restUrl'     => esc_url_raw(rest_url('asp/v1/event')),
+            'reactionUrl' => esc_url_raw(rest_url('asp/v1/reaction')),
+            'statsUrl'    => esc_url_raw(rest_url('asp/v1/post-stats')),
+            'nonce'       => wp_create_nonce('wp_rest'),
+            'debug'       => defined('WP_DEBUG') && WP_DEBUG,
+            'i18n'        => [
                 'play'        => __('Odtwórz streszczenie audio', 'audio-summary-player'),
                 'pause'       => __('Wstrzymaj odtwarzanie', 'audio-summary-player'),
                 'speedLabel'  => __('Prędkość odtwarzania, aktualnie %sx', 'audio-summary-player'),
