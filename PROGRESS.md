@@ -7,7 +7,7 @@ Plik śledzący postęp prac. Po wykonaniu zadania zmień `[ ]` na `[x]`. Każdy
 - `[x]` — wykonane
 - `[~]` — w trakcie / częściowe
 
-**Aktualny etap:** Etap 1 (szkielet + frontend player)
+**Aktualny etap:** Etap 2 (tracking + REST + DB)
 
 ---
 
@@ -100,72 +100,73 @@ Plik śledzący postęp prac. Po wykonaniu zadania zmień `[ ]` na `[x]`. Każdy
 **Cel:** Eventy lecą do bazy. Boty oznaczane. Rate limit działa.
 
 ### 2.1 Schema bazy danych
-- [ ] `src/Database/Schema.php` — `CREATE TABLE` zgodnie ze spec 9.1
-- [ ] Wywołanie `dbDelta()` przy aktywacji wtyczki
-- [ ] Opcja `asp_db_version` zapisywana
-- [ ] Wszystkie indeksy (`idx_post_event`, `idx_post_session`, `idx_created`)
-- [ ] Charset `utf8mb4`, collation `utf8mb4_unicode_ci`
-- [ ] Brak kolumn `ip`/`user_agent` (RODO)
+- [x] `src/Database/Schema.php` — `CREATE TABLE` zgodnie ze spec 9.1
+- [x] Wywołanie `dbDelta()` przy aktywacji wtyczki
+- [x] Opcja `asp_db_version` zapisywana
+- [x] Wszystkie indeksy (`idx_post_event`, `idx_post_session`, `idx_created`)
+- [x] Charset `utf8mb4`, collation `utf8mb4_unicode_ci` (przez `$wpdb->get_charset_collate()`)
+- [x] Brak kolumn `ip`/`user_agent` (RODO)
 
 ### 2.2 Repozytorium eventów
-- [ ] `src/Database/EventRepository.php` — metoda `insert($event)`
-- [ ] Wszystkie SQL przez `$wpdb->prepare()`
-- [ ] Sanityzacja: `absint()`, `sanitize_key()`, `floatval()`
-- [ ] Obsługa błędu insertu — log + return false
+- [x] `src/Database/EventRepository.php` — metoda `insert($event)`
+- [x] Wszystkie SQL przez `$wpdb->prepare()` / `$wpdb->insert()` z formatami
+- [x] Sanityzacja: `absint()`, `sanitize_key()`, `floatval()`
+- [x] Obsługa błędu insertu — log + return false
 
 ### 2.3 REST endpoint
-- [ ] `src/REST/EventController.php` — `register_rest_route` dla `asp/v1/event`
-- [ ] Metoda POST, `permission_callback` → nonce check
-- [ ] `src/REST/EventValidator.php` — walidacja payloadu
-- [ ] Walidacja `post_id` (musi być publikowanym postem)
-- [ ] Walidacja `session_id` (regex UUID v4)
-- [ ] Walidacja `event_type` (whitelist)
-- [ ] Walidacja `position` (0 ≤ pos ≤ duration)
-- [ ] Walidacja `speed` (0.5–3.0)
-- [ ] Walidacja `extra` per event_type
-- [ ] Response: 201 sukces, 400 walidacja, 429 rate limit
-- [ ] `wp_localize_script` przekazuje nonce + endpoint URL do JS
+- [x] `src/REST/EventController.php` — `register_rest_route` dla `asp/v1/event`
+- [x] Metoda POST, `permission_callback` → nonce check
+- [x] `src/REST/EventValidator.php` — walidacja payloadu
+- [x] Walidacja `post_id` (musi być publikowanym postem)
+- [x] Walidacja `session_id` (regex UUID v4)
+- [x] Walidacja `event_type` (whitelist)
+- [x] Walidacja `position` (0 ≤ pos ≤ duration)
+- [x] Walidacja `speed` (0.5–3.0)
+- [x] Walidacja `extra` per event_type (whitelist kluczy)
+- [x] Response: 201 sukces, 400 walidacja, 429 rate limit
+- [x] `wp_localize_script` przekazuje nonce + endpoint URL do JS (już z Etapu 1)
 
 ### 2.4 Rate limiting
-- [ ] Per `session_id`: 30 eventów/min (transient `asp_rate_{session_id}`)
-- [ ] Per IP: 200 eventów/min (transient `asp_rate_ip_{md5(ip)}`)
-- [ ] IP nie zapisywane w DB
-- [ ] 429 response z `retry_after`
+- [x] Per `session_id`: 30 eventów/min (transient `asp_rate_{md5(session_id)}`)
+- [x] Per IP: 200 eventów/min (transient `asp_rate_ip_{md5(ip)}`)
+- [x] IP nie zapisywane w DB (tylko ulotny klucz transienta)
+- [x] 429 response z `retry_after`
 
 ### 2.5 Bot detector
-- [ ] `src/Support/BotDetector.php` — whitelist popularnych botów
-- [ ] Heurystyki: puste UA, krótkie UA, słowa "bot/crawler/spider"
-- [ ] Filter `asp_bot_user_agents` do customizacji
-- [ ] `is_bot=1` zapisywane przy insercie, nie blokuje insertu
-- [ ] User-Agent NIE zapisywany w bazie (tylko ulotnie)
+- [x] `src/Support/BotDetector.php` — whitelist popularnych botów
+- [x] Heurystyki: puste UA, krótkie UA, słowa "bot/crawler/spider"
+- [x] Filter `asp_bot_user_agents` do customizacji
+- [x] `is_bot=1` zapisywane przy insercie, nie blokuje insertu
+- [x] User-Agent NIE zapisywany w bazie (tylko ulotnie)
 
 ### 2.6 Session ID
-- [ ] `src/Support/SessionId.php` — walidacja UUID v4
-- [ ] JS: generacja UUID v4, zapis w `localStorage` jako `asp_session_id`
-- [ ] TTL 30 dni (rotacja)
-- [ ] Fallback do pamięci, gdy localStorage niedostępne
+- [x] `src/Support/SessionId.php` — walidacja UUID v4
+- [x] JS: generacja UUID v4, zapis w `localStorage` jako `asp_session_id`
+- [x] TTL 30 dni (rotacja)
+- [x] Fallback do pamięci, gdy localStorage niedostępne
 
 ### 2.7 Event tracker (frontend)
-- [ ] Event `play_intent` przy pierwszym play / resume
-- [ ] Event `pause` przy klik pause
-- [ ] Event `resume` przy play po pauzie
-- [ ] Eventy `checkpoint_25/50/75` raz per sesja (Set `checkpointsFired`)
-- [ ] Event `complete` (95% timeline + 90% total_listened)
-- [ ] Event `abandon` przez `navigator.sendBeacon` w `beforeunload`
-- [ ] Event `seek` z debounce 500ms (`from_position`, `to_position`)
-- [ ] Event `speed_change` z `new_speed`
-- [ ] `total_listened_seconds` liczone na froncie
-- [ ] Throttling: `timeupdate` NIE wysyłany do API
-- [ ] Buforowanie eventów przy offline + retry przy `online`
-- [ ] Cicha porażka przy 4xx/5xx (console.warn w WP_DEBUG)
+- [x] Event `play_intent` przy pierwszym play / resume
+- [x] Event `pause` przy klik pause
+- [x] Event `resume` przy play po pauzie
+- [x] Eventy `checkpoint_25/50/75` raz per sesja (Set `checkpointsFired`)
+- [x] Event `complete` (95% timeline + 90% total_listened)
+- [x] Event `abandon` przez `navigator.sendBeacon` w `beforeunload` / `pagehide`
+- [x] Event `seek` z debounce 500ms (`from_position`, `to_position`)
+- [x] Event `speed_change` z `new_speed`
+- [x] `total_listened_seconds` liczone na froncie
+- [x] Throttling: `timeupdate` NIE wysyłany do API
+- [x] Buforowanie eventów przy offline + retry przy `online`
+- [x] Cicha porażka przy 4xx/5xx (console.warn w WP_DEBUG)
 
 ### Definicja ukończenia Etapu 2
-- [ ] Po odsłuchaniu artykułu w tabeli `wp_asp_events` pojawiają się eventy
-- [ ] Boty są oznaczone `is_bot=1`
-- [ ] Rate limit zwraca 429 po przekroczeniu
-- [ ] `abandon` wysyłany przy zamknięciu karty
-- [ ] Walidacja odrzuca błędne payloady (400)
-- [ ] Brak danych osobowych w bazie (audyt schemy)
+- [x] Walidacja odrzuca błędne payloady (400) — sprawdzone logiką walidatora
+- [x] Brak danych osobowych w bazie (audyt schemy — patrz `Schema::migrate()`, brak kolumn `ip`/`user_agent`)
+- [x] Wszystkie pliki PHP przechodzą `php -l` bez błędów
+- [ ] Po odsłuchaniu artykułu w tabeli `wp_asp_events` pojawiają się eventy — wymaga manualnego testu w WP
+- [ ] Boty są oznaczone `is_bot=1` — wymaga manualnego testu w WP (curl z UA "Googlebot")
+- [ ] Rate limit zwraca 429 po przekroczeniu — wymaga manualnego testu w WP
+- [ ] `abandon` wysyłany przy zamknięciu karty — wymaga manualnego testu w przeglądarce
 
 ---
 
@@ -322,3 +323,10 @@ Miejsce na ad-hoc notatki w trakcie pracy (decyzje, blokery, TODO odłożone na 
 - **Render bloku:** `block.json` deklaruje `render: "file:./render.php"`, a `BlockRegistration` dodatkowo przekazuje `render_callback` przy `register_block_type`. WordPress preferuje `render_callback` z parametru — to świadome, daje jeden punkt prawdy w klasie PHP, plik `render.php` zostaje jako fallback dla edge case'ów.
 - **Build bloku (fix):** Pierwsza wersja Stage 1 nie miała kompilacji bloku — `block/index.js` z `import`/JSX nie działa w przeglądarce. Naprawione: `npm run build` używa `wp-scripts build --webpack-src-dir=block --output-path=block/build`, `block.json` w buildzie wskazuje `index.js`/`index.css`/`style-index.css` w katalogu `block/build/`. `BlockRegistration::registerBlock()` rejestruje z `block/build/` jeśli istnieje, inaczej fallback do `block/` (source). Katalog `block/build/` commitowany do repo, by wtyczka działała po `git pull` bez wymogu Node po stronie deploya.
 - **Shortcode `[asp_player]`:** zaimplementowany zgodnie z decyzją z CLAUDE.md sekcja 9 (otwarte pytanie #1). Late-enqueue jeśli `wp_enqueue_scripts` już zostało odpalone.
+
+### Etap 2
+- **`extra_data` jako LONGTEXT zamiast JSON:** spec sekcja 9.1 deklaruje typ JSON, ale `dbDelta()` ma znane problemy z parsowaniem `JSON` w `CREATE TABLE` (różnice formatowania powodują błędne re-creating). LONGTEXT jest pragmatycznym kompromisem — `JSON_EXTRACT()` w MySQL 5.7+ działa też na TEXT/LONGTEXT zawierającym poprawny JSON (sprawdzone w spec sekcja 12.3). Migracja do natywnego JSON może być rozważona w wersji 1.0 razem z bumpem `Schema::SCHEMA_VERSION`.
+- **Rate limit per session_id keyed by `md5(session_id)`:** WordPress transienty mają limit 172 znaków na klucz w niektórych obiektowych cache backendach. UUID v4 to 36 znaków, ale `md5` zachowuje stałą długość 32 znaków i izoluje od ewentualnych nielegalnych znaków, gdyby walidator został pominięty.
+- **`sendBeacon` + `_wpnonce` query param:** `navigator.sendBeacon` nie pozwala na custom headers, więc nonce jedzie w query stringu jako `_wpnonce`. `EventController::permission()` ma fallback z `X-WP-Nonce` na `_wpnonce` żeby oba transporty (fetch + beacon) działały tym samym kodem walidacji.
+- **Event tracker silenced before `loadedmetadata`:** `Player.dispatch()` skipuje wysyłkę gdy `duration <= 0` — spec walidatora wymaga `duration > 0`, a player może wystartować zanim `loadedmetadata` się odpali. Skip > błąd 400 w konsoli.
+- **`Schema::maybeUpgrade()` na `plugins_loaded`:** dbDelta tylko gdy `asp_db_version` ≠ `SCHEMA_VERSION`, więc happy path to jeden `get_option` per request. Bez kosztu.
