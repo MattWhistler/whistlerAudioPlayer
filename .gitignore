@@ -1,7 +1,6 @@
 node_modules/
 vendor/
 assets/build/
-block/build/
 *.log
 .DS_Store
 .idea/

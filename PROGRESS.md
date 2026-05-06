@@ -45,7 +45,7 @@ Plik śledzący postęp prac. Po wykonaniu zadania zmień `[ ]` na `[x]`. Każdy
 - [x] `assets/src/player.js` — state machine (idle/playing/paused/ended)
 - [x] `assets/src/player.scss` + `player.css` — style zgodne z design tokens
 - [x] CSS variables (`--asp-accent` itp.) zdefiniowane w `:root`
-- [~] Build pipeline produkuje `assets/build/player.min.js` i `.min.css` — wymaga `npm install && npm run build` w środowisku z Node 18+; AssetLoader preferuje `assets/build/` gdy istnieje, inaczej fallback do `assets/src/`. Stage 1 działa bez build-stepu.
+- [x] Build pipeline produkuje `block/build/` (wymagane dla edytora — JSX/ESM) oraz `assets/build/player.js` (frontend, fallback do `assets/src/`). `npm install && npm run build` używa `@wordpress/scripts` z konwencją src→build.
 
 ### 1.4 Funkcjonalność playera (UI bez trackingu)
 - [x] FR-1: Duży okrągły play button 56px po lewej + tekst po prawej
@@ -320,4 +320,5 @@ Miejsce na ad-hoc notatki w trakcie pracy (decyzje, blokery, TODO odłożone na 
 - **Tracking stub:** `Player.dispatch()` w `assets/src/player.js` emituje `CustomEvent('asp:event', { detail })` zamiast POST do REST. Etap 2 podmieni transport na `fetch` + `navigator.sendBeacon` bez zmian w state machine.
 - **DoD frontendowy:** punkty wymagające realnej przeglądarki (rotacja tekstu, mini-bar przy scrollu, audio playback) nie mogą być zweryfikowane w tym środowisku. Pozostawione `[ ]` z adnotacją "wymaga manualnego testu w WP". User powinien wykonać test po pierwszym deploymencie.
 - **Render bloku:** `block.json` deklaruje `render: "file:./render.php"`, a `BlockRegistration` dodatkowo przekazuje `render_callback` przy `register_block_type`. WordPress preferuje `render_callback` z parametru — to świadome, daje jeden punkt prawdy w klasie PHP, plik `render.php` zostaje jako fallback dla edge case'ów.
+- **Build bloku (fix):** Pierwsza wersja Stage 1 nie miała kompilacji bloku — `block/index.js` z `import`/JSX nie działa w przeglądarce. Naprawione: `npm run build` używa `wp-scripts build --webpack-src-dir=block --output-path=block/build`, `block.json` w buildzie wskazuje `index.js`/`index.css`/`style-index.css` w katalogu `block/build/`. `BlockRegistration::registerBlock()` rejestruje z `block/build/` jeśli istnieje, inaczej fallback do `block/` (source). Katalog `block/build/` commitowany do repo, by wtyczka działała po `git pull` bez wymogu Node po stronie deploya.
 - **Shortcode `[asp_player]`:** zaimplementowany zgodnie z decyzją z CLAUDE.md sekcja 9 (otwarte pytanie #1). Late-enqueue jeśli `wp_enqueue_scripts` już zostało odpalone.

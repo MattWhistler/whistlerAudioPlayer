@@ -16,8 +16,12 @@ final class BlockRegistration
 
     public function registerBlock(): void
     {
+        $built = ASP_PLUGIN_DIR . 'block/build';
+        $source = ASP_PLUGIN_DIR . 'block';
+        $path = is_dir($built) && file_exists($built . '/block.json') ? $built : $source;
+
         register_block_type(
-            ASP_PLUGIN_DIR . 'block',
+            $path,
             [
                 'render_callback' => [BlockRenderer::class, 'render'],
             ]
