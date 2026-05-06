@@ -66,6 +66,14 @@ final class AssetLoader
                 'play'        => __('Odtwórz streszczenie audio', 'audio-summary-player'),
                 'pause'       => __('Wstrzymaj odtwarzanie', 'audio-summary-player'),
                 'speedLabel'  => __('Prędkość odtwarzania, aktualnie %sx', 'audio-summary-player'),
+                // Polski ma trzy formy liczby mnogiej dla rzeczowników:
+                // [0] singular (n=1), [1] paucal (n%10 in 2..4 except 12..14),
+                // [2] plural (reszta, w tym 0). Frontend wybiera formę przez aspPluralPL().
+                'playsForms'  => [
+                    __('odtworzenie', 'audio-summary-player'),
+                    __('odtworzenia', 'audio-summary-player'),
+                    __('odtworzeń', 'audio-summary-player'),
+                ],
             ],
         ]);
     }

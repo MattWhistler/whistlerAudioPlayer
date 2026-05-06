@@ -29,6 +29,23 @@
 		}
 	}
 
+	/**
+	 * Polska liczba mnoga: zwraca formę [singular, paucal, plural] zgodnie
+	 * z regułami CLDR dla `pl`. n=1 → singular; n%10∈{2..4} ∧ n%100∉{12..14}
+	 * → paucal; reszta (w tym 0) → plural.
+	 */
+	function aspPluralPL( n, forms ) {
+		if ( ! forms || forms.length < 3 ) return '';
+		n = Math.abs( parseInt( n, 10 ) || 0 );
+		if ( n === 1 ) return forms[ 0 ];
+		const mod10 = n % 10;
+		const mod100 = n % 100;
+		if ( mod10 >= 2 && mod10 <= 4 && ( mod100 < 12 || mod100 > 14 ) ) {
+			return forms[ 1 ];
+		}
+		return forms[ 2 ];
+	}
+
 	function uuidv4() {
 		if ( window.crypto && typeof window.crypto.randomUUID === 'function' ) {
 			return window.crypto.randomUUID();
@@ -638,6 +655,7 @@
 			this.root = root;
 			this.postId = parseInt( root.dataset.postId || '0', 10 );
 			this.playsValueEl = root.querySelector( '[data-asp-plays-value]' );
+			this.playsLabelEl = root.querySelector( '[data-asp-plays-label]' );
 			this.likeBtn = root.querySelector( '[data-asp-reaction="like"]' );
 			this.dislikeBtn = root.querySelector( '[data-asp-reaction="dislike"]' );
 			this.likeCountEl = root.querySelector( '[data-asp-likes]' );
@@ -668,8 +686,12 @@
 		}
 
 		applyCounts( data ) {
+			const playsCount = parseInt( data.plays, 10 ) || 0;
 			if ( this.playsValueEl ) {
-				this.playsValueEl.textContent = String( data.plays || 0 );
+				this.playsValueEl.textContent = String( playsCount );
+			}
+			if ( this.playsLabelEl && cfg.i18n && cfg.i18n.playsForms ) {
+				this.playsLabelEl.textContent = aspPluralPL( playsCount, cfg.i18n.playsForms );
 			}
 			if ( this.likeCountEl ) {
 				this.likeCountEl.textContent = String( data.likes || 0 );
