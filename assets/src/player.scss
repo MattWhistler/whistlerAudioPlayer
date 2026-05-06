@@ -210,16 +210,21 @@
 		align-items: baseline;
 		gap: 5px;
 		font-variant-numeric: tabular-nums;
+		color: var(--asp-text);
+		opacity: 1;
 	}
 
 	&__plays-value {
 		font-weight: 700;
 		color: var(--asp-text);
 		font-size: 15px;
+		opacity: 1;
 	}
 
 	&__plays-label {
-		color: var(--asp-text-secondary);
+		color: var(--asp-text);
+		font-weight: 500;
+		opacity: 1;
 	}
 
 	&__reactions {
@@ -235,15 +240,16 @@
 		font-size: 13px;
 		line-height: 1;
 		background: transparent;
-		border: 1px solid var(--asp-border);
+		border: 1px solid var(--asp-text-secondary);
 		border-radius: 999px;
 		color: var(--asp-text);
+		opacity: 1;
 		cursor: pointer;
 		transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
 
 		&:hover {
 			color: var(--asp-text);
-			border-color: var(--asp-text-secondary);
+			border-color: var(--asp-text);
 			background: var(--asp-bg-secondary);
 		}
 
@@ -259,7 +265,6 @@
 		}
 
 		&[disabled] {
-			opacity: 0.6;
 			cursor: default;
 		}
 	}
@@ -271,7 +276,9 @@
 
 	&__reaction-count {
 		font-variant-numeric: tabular-nums;
-		font-weight: 600;
+		font-weight: 700;
+		color: inherit;
+		opacity: 1;
 	}
 }
 

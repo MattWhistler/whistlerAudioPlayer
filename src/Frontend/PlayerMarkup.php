@@ -118,7 +118,7 @@ final class PlayerMarkup
         <div class="asp-meta" data-asp-meta data-post-id="<?php echo esc_attr((string) $postId); ?>">
             <span class="asp-meta__plays" data-asp-plays>
                 <span class="asp-meta__plays-value" data-asp-plays-value>—</span>
-                <span class="asp-meta__plays-label"><?php esc_html_e('odtworzeń', 'audio-summary-player'); ?></span>
+                <span class="asp-meta__plays-label" data-asp-plays-label><?php esc_html_e('odtworzeń', 'audio-summary-player'); ?></span>
             </span>
             <span class="asp-meta__reactions" data-asp-reactions>
                 <button
