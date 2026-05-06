@@ -47,6 +47,16 @@ final class BotDetector
             'perplexitybot',
         ];
 
+        $extra = (string) get_option('asp_excluded_user_agents', '');
+        if ($extra !== '') {
+            foreach (preg_split('/\r\n|\r|\n/', $extra) ?: [] as $line) {
+                $line = trim($line);
+                if ($line !== '') {
+                    $defaults[] = $line;
+                }
+            }
+        }
+
         /** @var string[] $list */
         $list = apply_filters('asp_bot_user_agents', $defaults);
         return array_values(array_filter(array_map('strtolower', array_map('strval', $list))));

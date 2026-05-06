@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace AudioSummaryPlayer;
 
+use AudioSummaryPlayer\Admin\CsvExporter;
+use AudioSummaryPlayer\Admin\PostMetabox;
 use AudioSummaryPlayer\Admin\SettingsPage;
+use AudioSummaryPlayer\Admin\StatsPage;
 use AudioSummaryPlayer\Block\BlockRegistration;
 use AudioSummaryPlayer\Database\Schema;
 use AudioSummaryPlayer\Frontend\AssetLoader;
 use AudioSummaryPlayer\Frontend\Shortcode;
 use AudioSummaryPlayer\REST\EventController;
+use AudioSummaryPlayer\Support\CronCleanup;
 
 /**
  * Plugin bootstrap. Wires hooks during `plugins_loaded`.
@@ -39,12 +43,14 @@ final class Plugin
         }
 
         Schema::migrate();
+        CronCleanup::schedule();
 
         flush_rewrite_rules();
     }
 
     public static function deactivate(): void
     {
+        CronCleanup::unschedule();
         flush_rewrite_rules();
     }
 
@@ -62,9 +68,13 @@ final class Plugin
         (new AssetLoader())->register();
         (new Shortcode())->register();
         (new EventController())->register();
+        (new CronCleanup())->register();
 
         if (is_admin()) {
             (new SettingsPage())->register();
+            (new StatsPage())->register();
+            (new PostMetabox())->register();
+            (new CsvExporter())->register();
         }
     }
 }

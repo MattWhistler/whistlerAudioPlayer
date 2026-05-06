@@ -7,7 +7,7 @@ Plik śledzący postęp prac. Po wykonaniu zadania zmień `[ ]` na `[x]`. Każdy
 - `[x]` — wykonane
 - `[~]` — w trakcie / częściowe
 
-**Aktualny etap:** Etap 2 (tracking + REST + DB)
+**Aktualny etap:** Etap 3 (panel administracyjny)
 
 ---
 
@@ -175,69 +175,69 @@ Plik śledzący postęp prac. Po wykonaniu zadania zmień `[ ]` na `[x]`. Każdy
 **Cel:** Admin widzi statystyki, lejek, eksport CSV.
 
 ### 3.1 Metabox per artykuł
-- [ ] `src/Admin/PostMetabox.php` — `add_meta_box` w sidebarze pod publish
-- [ ] Capability check: `edit_posts`
-- [ ] AJAX-owy fetch danych (nie blokować ładowania edytora)
-- [ ] Total Plays (unique session_id z `play_intent`)
-- [ ] Completion Rate (% complete / play_intent)
-- [ ] Avg Listen Time
-- [ ] Funnel: start → 25% → 50% → 75% → complete (wartości i %)
-- [ ] Link "Pełne statystyki →" do strony z filtrem po post_id
-- [ ] Cache 60s w transient `asp_metabox_{post_id}`
+- [x] `src/Admin/PostMetabox.php` — `add_meta_box` w sidebarze pod publish
+- [x] Capability check: `edit_posts`
+- [x] AJAX-owy fetch danych (nie blokować ładowania edytora)
+- [x] Total Plays (unique session_id z `play_intent`)
+- [x] Completion Rate (% complete / play_intent)
+- [x] Avg Listen Time
+- [x] Funnel: start → 25% → 50% → 75% → complete (wartości i %)
+- [x] Link "Pełne statystyki →" do strony z filtrem po post_id
+- [x] Cache 60s w transient `asp_metabox_{post_id}`
 
 ### 3.2 Strona statystyk
-- [ ] `src/Admin/StatsPage.php` — `Tools → Statystyki Audio Player`
-- [ ] Capability check (konfigurowalne, default `manage_options`)
-- [ ] Filtry: zakres dat (7/30/90/180/custom), sortowanie, kategoria, boty
-- [ ] Tabela: tytuł / plays / completion / avg listen / lejek / akcje
-- [ ] Lejek mini-wykres słupkowy (4 słupki)
-- [ ] Modal "Szczegóły" z pełnym lejkiem i eventami
-- [ ] Wykres ogólny: liczba odsłuchań w czasie (line chart)
-- [ ] Wykres speed distribution (pie chart)
-- [ ] Paginacja przy dużych zbiorach
+- [x] `src/Admin/StatsPage.php` — `Tools → Statystyki Audio Player`
+- [x] Capability check (konfigurowalne, default `manage_options`)
+- [x] Filtry: zakres dat (7/30/90/180/custom), sortowanie, kategoria, boty
+- [x] Tabela: tytuł / plays / completion / avg listen / lejek / akcje
+- [x] Lejek mini-wykres słupkowy (4 słupki)
+- [x] Modal "Szczegóły" z pełnym lejkiem i eventami
+- [x] Wykres ogólny: liczba odsłuchań w czasie (line chart)
+- [x] Wykres speed distribution (pie chart)
+- [x] Paginacja przy dużych zbiorach
 
 ### 3.3 Eksport CSV
-- [ ] Eksport całej tabeli
-- [ ] Eksport eventów per post
-- [ ] Stream przez `fputcsv` (chunked, nie buduj w pamięci)
-- [ ] Poprawny format dla Excel (BOM UTF-8, separator)
+- [x] Eksport całej tabeli
+- [x] Eksport eventów per post
+- [x] Stream przez `fputcsv` (chunked, nie buduj w pamięci)
+- [x] Poprawny format dla Excel (BOM UTF-8, separator)
 
 ### 3.4 Zapytania agregujące
-- [ ] Total unique plays per post (zgodnie ze spec 12.3)
-- [ ] Funnel per post
-- [ ] Avg listen time z `JSON_EXTRACT`
-- [ ] Speed distribution
-- [ ] Wszystkie z `is_bot = 0` w domyślnym filtrze
+- [x] Total unique plays per post (zgodnie ze spec 12.3)
+- [x] Funnel per post
+- [x] Avg listen time z `JSON_EXTRACT`
+- [x] Speed distribution
+- [x] Wszystkie z `is_bot = 0` w domyślnym filtrze
 
 ### 3.5 WP-Cron cleanup
-- [ ] Event `asp_cleanup_old_events` rejestrowany przy aktywacji (daily)
-- [ ] Czyści eventy starsze niż `data_retention_days` (default 180)
-- [ ] Konfigurowalne: 30/90/180/365/forever
+- [x] Event `asp_cleanup_old_events` rejestrowany przy aktywacji (daily)
+- [x] Czyści eventy starsze niż `data_retention_days` (default 180)
+- [x] Konfigurowalne: 30/90/180/365/forever
 
 ### 3.6 Pełny SettingsPage
-- [ ] `cta_text` (textarea/input)
-- [ ] `accent_color` (color picker)
-- [ ] `enable_minibar` (checkbox)
-- [ ] `minibar_min_duration` (number, default 30)
-- [ ] `enable_speed_control` (checkbox)
-- [ ] `data_retention_days` (select)
-- [ ] `keep_data_on_uninstall` (checkbox)
-- [ ] `stats_capability` (select)
-- [ ] `excluded_user_agents` (textarea, lista linii)
-- [ ] Wszystkie opcje przez WP Settings API
+- [x] `cta_text` (textarea/input)
+- [x] `accent_color` (color picker)
+- [x] `enable_minibar` (checkbox)
+- [x] `minibar_min_duration` (number, default 30)
+- [x] `enable_speed_control` (checkbox)
+- [x] `data_retention_days` (select)
+- [x] `keep_data_on_uninstall` (checkbox)
+- [x] `stats_capability` (select)
+- [x] `excluded_user_agents` (textarea, lista linii)
+- [x] Wszystkie opcje przez WP Settings API
 
 ### 3.7 Uninstall
-- [ ] `uninstall.php` — sprawdź `asp_keep_data_on_uninstall`
-- [ ] Jeśli false: DROP TABLE + delete options `asp_*`
-- [ ] Jeśli true: tylko delete options
+- [x] `uninstall.php` — sprawdź `asp_keep_data_on_uninstall`
+- [x] Jeśli false: DROP TABLE + delete options `asp_*`
+- [x] Jeśli true: tylko delete options
 
 ### Definicja ukończenia Etapu 3
-- [ ] Metabox wyświetla statystyki zgodne z bazą
-- [ ] Strona statystyk: filtry działają, tabela poprawna
-- [ ] Eksport CSV otwiera się w Excelu
-- [ ] Cron cleanup działa (manualny test)
-- [ ] Settings zapisują się i wpływają na zachowanie playera
-- [ ] Uninstall zachowuje się zgodnie z opcją
+- [ ] Metabox wyświetla statystyki zgodne z bazą — wymaga manualnego testu w WP
+- [ ] Strona statystyk: filtry działają, tabela poprawna — wymaga manualnego testu w WP
+- [ ] Eksport CSV otwiera się w Excelu — wymaga manualnego testu w WP
+- [ ] Cron cleanup działa (manualny test) — wymaga manualnego testu w WP
+- [ ] Settings zapisują się i wpływają na zachowanie playera — wymaga manualnego testu w WP
+- [ ] Uninstall zachowuje się zgodnie z opcją — wymaga manualnego testu w WP
 
 ---
 
@@ -323,6 +323,13 @@ Miejsce na ad-hoc notatki w trakcie pracy (decyzje, blokery, TODO odłożone na 
 - **Render bloku:** `block.json` deklaruje `render: "file:./render.php"`, a `BlockRegistration` dodatkowo przekazuje `render_callback` przy `register_block_type`. WordPress preferuje `render_callback` z parametru — to świadome, daje jeden punkt prawdy w klasie PHP, plik `render.php` zostaje jako fallback dla edge case'ów.
 - **Build bloku (fix):** Pierwsza wersja Stage 1 nie miała kompilacji bloku — `block/index.js` z `import`/JSX nie działa w przeglądarce. Naprawione: `npm run build` używa `wp-scripts build --webpack-src-dir=block --output-path=block/build`, `block.json` w buildzie wskazuje `index.js`/`index.css`/`style-index.css` w katalogu `block/build/`. `BlockRegistration::registerBlock()` rejestruje z `block/build/` jeśli istnieje, inaczej fallback do `block/` (source). Katalog `block/build/` commitowany do repo, by wtyczka działała po `git pull` bez wymogu Node po stronie deploya.
 - **Shortcode `[asp_player]`:** zaimplementowany zgodnie z decyzją z CLAUDE.md sekcja 9 (otwarte pytanie #1). Late-enqueue jeśli `wp_enqueue_scripts` już zostało odpalone.
+
+### Etap 3
+- **Charty bez bibliotek zewnętrznych:** line chart i pie chart renderowane jako inline SVG w PHP (`StatsPage::renderLineChart/renderPieChart`). Decyzja: keep admin lekkim, brak zewnętrznych JS-ów (Chart.js etc.) — koszt utrzymania mniejszy, CSP-friendly. Skala osi Y to po prostu `max(values)` z labelką, X to data graniczna — wystarczy do detekcji trendu.
+- **`StatsRepository::streamEvents` chunkowane LIMIT/OFFSET:** prosty cursor (500 wierszy na chunk), `fputcsv` od razu do `php://output`. Brak budowania całej tablicy w pamięci — bezpieczne dla milionów eventów. UTF-8 BOM na początku pliku — Excel poprawnie wykrywa kodowanie.
+- **Modal "Szczegóły" — własny lekki widget:** brak jQuery UI / WP Modal. ~80 linii vanilla JS w `assets/admin/stats.js` z obsługą Esc, kliknięcia na backdrop i zamknięciem przyciskiem. Spec sec. 12.2 prosi o "modal", ale nie wymaga konkretnej biblioteki.
+- **Cron `asp_cleanup_old_events`:** `daily` schedule od `time() + HOUR_IN_SECONDS` żeby nie palić cyklu od razu po aktywacji. Wartość `0` w `asp_data_retention_days` oznacza "nigdy nie czyść" — wczesny return zamiast `DELETE WHERE created_at < epoch`.
+- **`accent_color` przez `wp_add_inline_style`:** zamiast generować kolejny plik CSS lub modyfikować markup playera, ustawiamy tylko `:root{--asp-accent:#…}` inline po pliku `player.css`. Brak FOUC, brak dodatkowego requestu, kompatybilne z dark-mode bo `--asp-accent` jest fallbackiem.
 
 ### Etap 2
 - **`extra_data` jako LONGTEXT zamiast JSON:** spec sekcja 9.1 deklaruje typ JSON, ale `dbDelta()` ma znane problemy z parsowaniem `JSON` w `CREATE TABLE` (różnice formatowania powodują błędne re-creating). LONGTEXT jest pragmatycznym kompromisem — `JSON_EXTRACT()` w MySQL 5.7+ działa też na TEXT/LONGTEXT zawierającym poprawny JSON (sprawdzone w spec sekcja 12.3). Migracja do natywnego JSON może być rozważona w wersji 1.0 razem z bumpem `Schema::SCHEMA_VERSION`.
