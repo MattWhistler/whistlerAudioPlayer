@@ -1,0 +1,18 @@
+{
+    "name": "audio-summary-player",
+    "version": "0.1.0",
+    "description": "WordPress plugin: custom audio player with anonymous listening analytics.",
+    "private": true,
+    "scripts": {
+        "build": "wp-scripts build block/index.js assets/src/player.js --output-path=assets/build",
+        "build:block": "wp-scripts build --webpack-src-dir=block --output-path=block/build",
+        "start": "wp-scripts start block/index.js assets/src/player.js --output-path=assets/build",
+        "lint:js": "wp-scripts lint-js",
+        "lint:css": "wp-scripts lint-style",
+        "format": "wp-scripts format",
+        "packages-update": "wp-scripts packages-update"
+    },
+    "devDependencies": {
+        "@wordpress/scripts": "^27.0.0"
+    }
+}
