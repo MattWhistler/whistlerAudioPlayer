@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Audio Summary Player
+ * Plugin Name:       AAA Audio Summary Player
  * Plugin URI:        https://github.com/MattWhistler/whistlerAudioPlayer
  * Description:       Custom audio player for article summaries with anonymous listening analytics.
  * Version:           0.1.0
