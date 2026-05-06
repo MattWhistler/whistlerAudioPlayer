@@ -73,6 +73,21 @@ Każdy etap zakłada, że poprzedni działa. Nie zaczynaj Etapu 2 dopóki Etap 1
 - W treści commita opisuj **DLACZEGO**, nie WHAT
 - **Nie tworzymy PR-ów chyba że user wprost poprosi**
 
+### 4.4 Bump wersji wtyczki (OBOWIĄZKOWO przed każdym commitem)
+
+**Przed KAŻDYM commitem** zwiększ numer wersji wtyczki. To krytyczne dla cache-bustingu plików JS/CSS (parametr `?ver=` jest budowany ze stałej `ASP_VERSION`).
+
+1. **Wersję trzymaj zsynchronizowaną w DWÓCH miejscach** w pliku `audio-summary-player.php`:
+   - Nagłówek `Version:` (linia ~6)
+   - Stała `define('ASP_VERSION', '...')` (linia ~22)
+   Obie wartości MUSZĄ być identyczne.
+2. **Reguła bumpa (SemVer-lite):**
+   - `chore:` / `docs:` / drobny `fix:` → bump PATCH (`0.1.1` → `0.1.2`)
+   - `feat:` (nowa funkcjonalność) → bump MINOR (`0.1.2` → `0.2.0`)
+   - Breaking change (zmiana DB schema, REST API, publiczne hooki) → bump MAJOR (`0.2.0` → `1.0.0`)
+3. **Po edycie plików, PRZED `git commit`:** podbij wersję, upewnij się że oba miejsca są zsynchronizowane, dopiero wtedy stage'uj i commituj.
+4. **Nie commituj zmian merytorycznych bez bumpa** — to gwarantuje, że użytkownicy zawsze dostaną świeże assety zamiast wersji z cache przeglądarki/CDN.
+
 ---
 
 ## 5. Standardy kodu

@@ -28,24 +28,24 @@ final class AssetLoader
             return;
         }
 
-        [$jsUrl, $jsPath]   = $this->resolveAsset('player.js');
-        [$cssUrl, $cssPath] = $this->resolveAsset('player.css');
+        [$jsUrl, ]  = $this->resolveAsset('player.js');
+        [$cssUrl, ] = $this->resolveAsset('player.css');
 
-        $jsVersion  = $jsPath !== null ? (string) filemtime($jsPath) : ASP_VERSION;
-        $cssVersion = $cssPath !== null ? (string) filemtime($cssPath) : ASP_VERSION;
-
+        // Cache-busting: WordPress dokleja `?ver=ASP_VERSION` do URL-a.
+        // Bump wersji wtyczki przy każdym commicie (patrz CLAUDE.md 4.4)
+        // unieważnia cache przeglądarek/CDN dla player.js i player.css.
         wp_enqueue_style(
             self::HANDLE_STYLE,
             $cssUrl,
             [],
-            $cssVersion
+            ASP_VERSION
         );
 
         wp_enqueue_script(
             self::HANDLE_SCRIPT,
             $jsUrl,
             [],
-            $jsVersion,
+            ASP_VERSION,
             true
         );
 
