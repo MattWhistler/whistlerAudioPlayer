@@ -202,7 +202,8 @@
 	margin: -1em 0 1.5em;
 	padding: 8px 4px 0;
 	font-size: 14px;
-	color: var(--asp-text);
+	color: var(--asp-text) !important;
+	opacity: 1 !important;
 }
 
 .asp-meta__plays {
@@ -210,21 +211,21 @@
 	align-items: baseline;
 	gap: 5px;
 	font-variant-numeric: tabular-nums;
-	color: var(--asp-text);
-	opacity: 1;
+	color: var(--asp-text) !important;
+	opacity: 1 !important;
 }
 
 .asp-meta__plays-value {
 	font-weight: 700;
-	color: var(--asp-text);
+	color: var(--asp-text) !important;
 	font-size: 15px;
-	opacity: 1;
+	opacity: 1 !important;
 }
 
 .asp-meta__plays-label {
-	color: var(--asp-text);
-	font-weight: 500;
-	opacity: 1;
+	color: var(--asp-text) !important;
+	font-weight: 600;
+	opacity: 1 !important;
 }
 
 .asp-meta__reactions {
@@ -239,17 +240,18 @@
 	padding: 5px 10px;
 	font-size: 13px;
 	line-height: 1;
-	background: transparent;
-	border: 1px solid var(--asp-text-secondary);
+	background: var(--asp-bg-secondary);
+	border: 1.5px solid var(--asp-text);
 	border-radius: 999px;
-	color: var(--asp-text);
-	opacity: 1;
+	color: var(--asp-text) !important;
+	font-weight: 600;
+	opacity: 1 !important;
 	cursor: pointer;
 	transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
 }
 
 .asp-meta__reaction:hover {
-	color: var(--asp-text);
+	color: var(--asp-text) !important;
 	border-color: var(--asp-text);
 	background: var(--asp-bg-secondary);
 }
@@ -262,11 +264,12 @@
 .asp-meta__reaction[aria-pressed="true"] {
 	background: var(--asp-accent-bg);
 	border-color: var(--asp-accent);
-	color: var(--asp-accent);
+	color: var(--asp-accent) !important;
 }
 
 .asp-meta__reaction[disabled] {
 	cursor: default;
+	opacity: 1 !important;
 }
 
 .asp-meta__reaction-icon {
@@ -277,8 +280,8 @@
 .asp-meta__reaction-count {
 	font-variant-numeric: tabular-nums;
 	font-weight: 700;
-	color: inherit;
-	opacity: 1;
+	color: inherit !important;
+	opacity: 1 !important;
 }
 
 /* ----- Mini-bar ----- */
