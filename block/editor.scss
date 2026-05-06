@@ -1,0 +1,8 @@
+@import '../assets/src/player.scss';
+
+.asp-block-editor {
+	.asp-player--editor-preview {
+		opacity: 0.95;
+		pointer-events: none;
+	}
+}

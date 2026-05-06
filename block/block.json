@@ -1,0 +1,25 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "audio-summary-player/player",
+    "title": "Odtwarzacz streszczenia",
+    "category": "media",
+    "icon": "controls-play",
+    "description": "Wstaw odtwarzacz audio ze streszczeniem artykułu",
+    "textdomain": "audio-summary-player",
+    "supports": {
+        "html": false,
+        "multiple": false,
+        "reusable": false
+    },
+    "attributes": {
+        "audioId": { "type": "number", "default": 0 },
+        "audioUrl": { "type": "string", "default": "" },
+        "audioDuration": { "type": "number", "default": 0 },
+        "ctaText": { "type": "string", "default": "" }
+    },
+    "render": "file:./render.php",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./editor.css",
+    "style": "file:./style.css"
+}
