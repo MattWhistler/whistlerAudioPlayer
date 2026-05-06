@@ -6,8 +6,10 @@ namespace AudioSummaryPlayer;
 
 use AudioSummaryPlayer\Admin\SettingsPage;
 use AudioSummaryPlayer\Block\BlockRegistration;
+use AudioSummaryPlayer\Database\Schema;
 use AudioSummaryPlayer\Frontend\AssetLoader;
 use AudioSummaryPlayer\Frontend\Shortcode;
+use AudioSummaryPlayer\REST\EventController;
 
 /**
  * Plugin bootstrap. Wires hooks during `plugins_loaded`.
@@ -36,6 +38,8 @@ final class Plugin
             wp_die(esc_html__('Audio Summary Player requires WordPress 6.0 or newer.', 'audio-summary-player'));
         }
 
+        Schema::migrate();
+
         flush_rewrite_rules();
     }
 
@@ -52,9 +56,12 @@ final class Plugin
             dirname(ASP_PLUGIN_BASENAME) . '/languages'
         );
 
+        Schema::maybeUpgrade();
+
         (new BlockRegistration())->register();
         (new AssetLoader())->register();
         (new Shortcode())->register();
+        (new EventController())->register();
 
         if (is_admin()) {
             (new SettingsPage())->register();

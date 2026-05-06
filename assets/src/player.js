@@ -1,9 +1,9 @@
 /**
  * Audio Summary Player — frontend runtime.
  *
- * Stage 1: full UI behavior (state machine, text rotator, mini-bar, speed,
- * keyboard a11y). Tracking is wired as a no-op `dispatchEvent` so Stage 2
- * can add transport without touching this file.
+ * Stage 2: state machine + EventTracker that POSTs to /wp-json/asp/v1/event,
+ * with sendBeacon for `abandon` and an offline-buffer queue that retries on
+ * the next `online` event.
  */
 
 ( function () {
@@ -16,14 +16,165 @@
 	const SEEK_STEP_S = 5;
 	const RING_CIRCUMFERENCE = 100.53; /* matches CSS stroke-dasharray */
 
+	const SESSION_KEY = 'asp_session_id';
+	const SESSION_TS_KEY = 'asp_session_ts';
+	const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; /* 30 days */
+
 	const reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
-	const cfg = window.aspConfig || { i18n: {}, debug: false };
+	const cfg = window.aspConfig || { i18n: {}, debug: false, restUrl: '', nonce: '' };
 
 	function debug( ...args ) {
 		if ( cfg.debug && typeof console !== 'undefined' ) {
 			console.warn( '[ASP]', ...args );
 		}
 	}
+
+	function uuidv4() {
+		if ( window.crypto && typeof window.crypto.randomUUID === 'function' ) {
+			return window.crypto.randomUUID();
+		}
+		const bytes = new Uint8Array( 16 );
+		( window.crypto || window.msCrypto ).getRandomValues( bytes );
+		bytes[ 6 ] = ( bytes[ 6 ] & 0x0f ) | 0x40;
+		bytes[ 8 ] = ( bytes[ 8 ] & 0x3f ) | 0x80;
+		const h = Array.from( bytes, ( b ) => b.toString( 16 ).padStart( 2, '0' ) );
+		return (
+			h.slice( 0, 4 ).join( '' ) + '-' +
+			h.slice( 4, 6 ).join( '' ) + '-' +
+			h.slice( 6, 8 ).join( '' ) + '-' +
+			h.slice( 8, 10 ).join( '' ) + '-' +
+			h.slice( 10, 16 ).join( '' )
+		);
+	}
+
+	/**
+	 * Session id manager. Persists UUID v4 in localStorage with a 30-day TTL.
+	 * Falls back to in-memory id when localStorage is unavailable
+	 * (private mode, ITP, etc.) — deduplication then degrades to per-pageload.
+	 */
+	const Session = ( function () {
+		let memoryId = null;
+		let storageWorks = true;
+		try {
+			window.localStorage.setItem( '__asp_probe', '1' );
+			window.localStorage.removeItem( '__asp_probe' );
+		} catch ( e ) {
+			storageWorks = false;
+		}
+
+		function rotate() {
+			const id = uuidv4();
+			if ( storageWorks ) {
+				try {
+					window.localStorage.setItem( SESSION_KEY, id );
+					window.localStorage.setItem( SESSION_TS_KEY, String( Date.now() ) );
+				} catch ( e ) {
+					storageWorks = false;
+				}
+			}
+			memoryId = id;
+			return id;
+		}
+
+		function get() {
+			if ( ! storageWorks ) {
+				return memoryId || ( memoryId = uuidv4() );
+			}
+			try {
+				const stored = window.localStorage.getItem( SESSION_KEY );
+				const ts = parseInt( window.localStorage.getItem( SESSION_TS_KEY ) || '0', 10 );
+				if ( stored && Date.now() - ts < SESSION_TTL_MS ) {
+					return stored;
+				}
+			} catch ( e ) {
+				storageWorks = false;
+				return memoryId || ( memoryId = uuidv4() );
+			}
+			return rotate();
+		}
+
+		return { get };
+	} )();
+
+	/**
+	 * EventTracker — minimal transport over the REST endpoint.
+	 *
+	 * - Regular events: fetch with keepalive (so they survive tab close most of the time).
+	 * - `abandon`: navigator.sendBeacon (guaranteed delivery on unload).
+	 * - Network failures: enqueue and replay on next `online`. Failures swallowed.
+	 */
+	const Tracker = ( function () {
+		const queue = [];
+		let online = typeof navigator !== 'undefined' ? navigator.onLine !== false : true;
+
+		window.addEventListener( 'online', () => {
+			online = true;
+			flush();
+		} );
+		window.addEventListener( 'offline', () => {
+			online = false;
+		} );
+
+		function flush() {
+			if ( ! online || ! cfg.restUrl ) return;
+			while ( queue.length ) {
+				const body = queue.shift();
+				postJson( body );
+			}
+		}
+
+		function postJson( body ) {
+			if ( ! cfg.restUrl ) return Promise.resolve();
+			return fetch( cfg.restUrl, {
+				method: 'POST',
+				credentials: 'same-origin',
+				keepalive: true,
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': cfg.nonce || '',
+				},
+				body: JSON.stringify( body ),
+			} ).then(
+				( res ) => {
+					if ( ! res.ok ) {
+						debug( 'event rejected', res.status );
+					}
+				},
+				( err ) => {
+					debug( 'event network error', err );
+					queue.push( body );
+				}
+			);
+		}
+
+		function send( body ) {
+			if ( ! cfg.restUrl ) return;
+			if ( ! online ) {
+				queue.push( body );
+				return;
+			}
+			postJson( body );
+		}
+
+		function sendBeacon( body ) {
+			if ( ! cfg.restUrl ) return;
+			if ( typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function' ) {
+				try {
+					/* sendBeacon ignores custom headers — nonce travels in payload too. */
+					const url = cfg.restUrl + ( cfg.restUrl.indexOf( '?' ) === -1 ? '?' : '&' ) + '_wpnonce=' + encodeURIComponent( cfg.nonce || '' );
+					const blob = new Blob( [ JSON.stringify( body ) ], { type: 'application/json' } );
+					if ( navigator.sendBeacon( url, blob ) ) {
+						return;
+					}
+				} catch ( e ) {
+					debug( 'sendBeacon failed', e );
+				}
+			}
+			send( body );
+		}
+
+		return { send, sendBeacon };
+	} )();
 
 	function formatTime( seconds ) {
 		if ( ! isFinite( seconds ) || seconds < 0 ) return '0:00';
@@ -414,18 +565,31 @@
 		}
 
 		dispatch( eventType, extra ) {
-			/* Stage 1: emit DOM event so future tracker module can subscribe.
-			 * Stage 2 will swap this for a REST POST + sendBeacon transport. */
+			const dur = this.audio.duration || this.duration || 0;
+			if ( ! this.postId || dur <= 0 ) {
+				/* Validator rejects payloads with duration <= 0 or post_id 0;
+				 * skip silently to avoid 400 spam before metadata loads. */
+				return;
+			}
 			const detail = {
 				post_id: this.postId,
+				session_id: Session.get(),
 				event_type: eventType,
 				position: this.audio.currentTime,
-				duration: this.audio.duration || this.duration,
+				duration: dur,
 				speed: this.speed,
 				extra: extra || {},
 			};
+
+			/* Mirror as DOM event for any third-party subscriber. */
 			document.dispatchEvent( new CustomEvent( 'asp:event', { detail } ) );
 			debug( 'event', detail );
+
+			if ( eventType === 'abandon' ) {
+				Tracker.sendBeacon( detail );
+			} else {
+				Tracker.send( detail );
+			}
 		}
 	}
 

@@ -4,7 +4,7 @@ Tags: audio, player, podcast, analytics, gutenberg
 Requires at least: 6.0
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,9 @@ Replaces the default WordPress `<audio>` element on articles with a branded play
 3. In the block editor, insert the "Odtwarzacz streszczenia" block and pick an audio file.
 
 == Changelog ==
+
+= 0.2.0 =
+* Stage 2: tracking pipeline. REST endpoint `asp/v1/event`, events table, validator, bot detector, rate limiting per session and IP, frontend tracker with offline buffer and `sendBeacon` for `abandon`.
 
 = 0.1.0 =
 * Stage 1: scaffolding, Gutenberg block, frontend player UI (no analytics yet).
