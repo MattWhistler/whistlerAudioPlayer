@@ -123,22 +123,26 @@ final class PlayerMarkup
             <span class="asp-meta__reactions" data-asp-reactions>
                 <button
                     type="button"
-                    class="asp-meta__reaction"
+                    class="asp-meta__reaction asp-meta__reaction--like"
                     data-asp-reaction="like"
                     aria-pressed="false"
                     aria-label="<?php echo esc_attr__('Lubię to streszczenie', 'audio-summary-player'); ?>"
                 >
-                    <span aria-hidden="true">👍</span>
+                    <svg class="asp-meta__reaction-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+                        <path d="M7 10v10H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3zm3 0 4-7a2 2 0 0 1 2 2v4h4.2a2 2 0 0 1 2 2.3l-1.4 7A2 2 0 0 1 18.8 20H10V10z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                    </svg>
                     <span class="asp-meta__reaction-count" data-asp-likes>0</span>
                 </button>
                 <button
                     type="button"
-                    class="asp-meta__reaction"
+                    class="asp-meta__reaction asp-meta__reaction--dislike"
                     data-asp-reaction="dislike"
                     aria-pressed="false"
                     aria-label="<?php echo esc_attr__('Nie lubię tego streszczenia', 'audio-summary-player'); ?>"
                 >
-                    <span aria-hidden="true">👎</span>
+                    <svg class="asp-meta__reaction-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+                        <path d="M17 14V4h3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-3zm-3 0-4 7a2 2 0 0 1-2-2v-4H4.8a2 2 0 0 1-2-2.3l1.4-7A2 2 0 0 1 6.2 4H14v10z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                    </svg>
                     <span class="asp-meta__reaction-count" data-asp-dislikes>0</span>
                 </button>
             </span>
