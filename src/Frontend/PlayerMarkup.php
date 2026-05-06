@@ -115,10 +115,17 @@ final class PlayerMarkup
         </div>
 
         <?php if ($postId > 0) : ?>
-        <div class="asp-meta" data-asp-meta data-post-id="<?php echo esc_attr((string) $postId); ?>">
-            <span class="asp-meta__plays" data-asp-plays>
-                <span class="asp-meta__plays-value" data-asp-plays-value>—</span>
-                <span class="asp-meta__plays-label" data-asp-plays-label><?php esc_html_e('odtworzeń', 'audio-summary-player'); ?></span>
+        <?php
+        // Inline-style fallback dla licznika odtworzeń: motywy potrafią
+        // przebijać nawet `!important` w arkuszu (np. przez warstwy/cascade
+        // layers albo regułę z `style=""`). Inline `!important` wygrywa
+        // zawsze, więc trzymamy go jako ostatnią linię obrony widoczności.
+        $playsStyle = 'color:#111!important;opacity:1!important;text-shadow:none!important;filter:none!important;mix-blend-mode:normal!important;font-style:normal!important;';
+        ?>
+        <div class="asp-meta" data-asp-meta data-post-id="<?php echo esc_attr((string) $postId); ?>" style="<?php echo esc_attr($playsStyle); ?>">
+            <span class="asp-meta__plays" data-asp-plays style="<?php echo esc_attr($playsStyle); ?>">
+                <span class="asp-meta__plays-value" data-asp-plays-value style="<?php echo esc_attr($playsStyle . 'font-weight:800!important;font-size:16px!important;'); ?>">—</span>
+                <span class="asp-meta__plays-label" data-asp-plays-label style="<?php echo esc_attr($playsStyle . 'font-weight:700!important;'); ?>"><?php esc_html_e('odtworzeń', 'audio-summary-player'); ?></span>
             </span>
             <span class="asp-meta__reactions" data-asp-reactions>
                 <button
